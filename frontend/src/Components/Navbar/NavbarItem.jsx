@@ -6,7 +6,6 @@ const NavbarItem = ({ itemName,fontSize }) => {
 
     const [isHovered,setIsHovered]=useState(false);
     const navStyles = {
-        // fontSize: {base:"3xl",md:"2xl"},
         color: "white",
         fontFamily: "inherit",
         testDecoration:"none",
@@ -23,7 +22,6 @@ const NavbarItem = ({ itemName,fontSize }) => {
         <Box
             w={"150%"}
             my={{base:"4"}}
-            // border={"2px solid red"}
             textAlign={"center"}
             onMouseEnter={()=> setIsHovered(!isHovered)}
             onMouseLeave={()=> setIsHovered(!isHovered)}

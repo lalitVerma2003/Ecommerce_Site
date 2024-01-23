@@ -1,10 +1,6 @@
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { Box, Button, Text, IconButton, Input } from "@chakra-ui/react";
-import { Link as ChakraLink } from "@chakra-ui/react";
-import { DataState } from "../../config/DataProvider";
+import { Box, Button, Text, IconButton,Link as ChakraLink,useDisclosure } from "@chakra-ui/react";
+import { useMemo } from "react";
 import axios from "axios";
-import NavbarItem from "./NavbarItem";
-import { useDisclosure } from "@chakra-ui/react";
 import { HamburgerIcon } from '@chakra-ui/icons';
 import {
     Drawer,
@@ -23,26 +19,18 @@ axios.defaults.withCredentials = true;
 function Navbar() {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { user } = DataState();
-    const navigate = useNavigate();
-    const logOut = async () => {
-        localStorage.removeItem("userInfo");
-        const { data } = await axios.get("http://localhost:3000/logout");
-        console.log("Log out", data);
-        navigate("/login");
-    }
 
-    useEffect(()=>{
-        const handleResize=()=>{
-            const width=window.innerWidth;
-            if(width>=768)
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width >= 768)
                 onClose();
         }
         window.addEventListener('resize', handleResize);
         return () => {
-          window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', handleResize);
         };
-    },[])
+    }, [])
 
     return (
         <Box
@@ -52,7 +40,6 @@ function Navbar() {
             justifyContent={"space-between"}
             alignContent={"center"}
             backgroundColor={"#38b6ff"}
-        // border={"2px solid red"}
         >
             <Text fontSize={"4xl"} fontFamily={"monospace"} fontWeight={"bold"} color={"white"} mx={5} >EasyBuyHub</Text>
             <Box
@@ -69,7 +56,6 @@ function Navbar() {
                 alignItems={"center"}
                 px={5}
                 mx={5}
-                // border={"2px solid black"}
                 backgroundColor={"#38b6ff"}
             >
                 <NavbarItems fontSize={"1xl"} />
@@ -84,7 +70,7 @@ function Navbar() {
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerCloseButton />
-                    <DrawerBody 
+                    <DrawerBody
                         display={"flex"}
                         flexDir={"column"}
                         justifyContent={"center"}
@@ -97,7 +83,7 @@ function Navbar() {
                 </DrawerContent>
             </Drawer>
         </Box>
-    );
+    )
 }
 
 export default Navbar;

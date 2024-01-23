@@ -1,5 +1,4 @@
 import React from 'react'
-import { Box, Button, Text, IconButton } from "@chakra-ui/react";
 import { Link as ChakraLink } from "@chakra-ui/react";
 import NavbarItem from "./NavbarItem";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -43,7 +42,7 @@ const NavbarItems = ({fontSize}) => {
                     </ChakraLink>}
                 </>
             }
-            <Text onClick={logOut} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></Text>
+            <ChakraLink onClick={logOut} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></ChakraLink>
         </>
     )
 }
