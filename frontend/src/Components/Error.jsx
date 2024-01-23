@@ -2,7 +2,7 @@ import { Box, Button } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 function Error() {
-
+    
     const navigate=useNavigate();
     return (
         <Box
