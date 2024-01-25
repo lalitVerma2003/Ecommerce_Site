@@ -1,54 +1,74 @@
-import axios from 'axios'
-import React, { useState } from 'react'
-import { DataState } from '../../config/DataProvider';
-import { Box, Input, Button, FormControl, FormLabel, useToast } from '@chakra-ui/react';
-import { InputGroup } from '@chakra-ui/react';
-import { InputRightElement } from '@chakra-ui/react';
-import { Text } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react'
+import { Box, Input, Button, FormControl, FormLabel, useToast, InputGroup, InputRightElement, Text, Link } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { Link } from '@chakra-ui/react'
-import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { useForm } from 'react-hook-form';
+import axios from 'axios'
+import { DataState } from '../../config/DataProvider';
+import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 
-axios.defaults.withCredentials=true;
+axios.defaults.withCredentials = true;
+const schema = z.object({
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(4)
+    .max(20)
+    .refine((value)=> /[A-Z]/.test(value),{
+        message: 'Password must contain at least one uppercase letter'
+    })
+    .refine((value)=> /[a-z]/.test(value),{
+      message: 'Password must contain at least one lowercase letter'
+    })
+    .refine((value)=> /\d/.test(value),{
+      message: 'Password must contain at least one digit',
+    })
+    .refine((value) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value), {
+      message: 'Password must contain at least one special character',
+    })
+});
 
 const Login = () => {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const toast = useToast();
 
-  const { user, setUser } = DataState();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
+
+  const { setUser } = DataState();
   const navigate = useNavigate();
 
   useEffect(() => {
     const user = localStorage.getItem("userInfo");
-    // if (user) {
-    //   navigate('/home');
-    // }
+    if (user) {
+      navigate('/home');
+    }
   })
 
-  const loginUser = async () => {
+  const loginUser = async (formData) => {
     try {
-    const config = {
-      headers: {
-        "Content-type": "application/json",
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        }
       }
-    }
-    const { data } = await axios.post("http://localhost:3000/login", {
-      email: email,
-      password: password
-    }, config);
-    console.log("Login:", data);
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    setUser(data);
-    navigate("/home");
-    toast({
-      title: 'Login Successfully',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    })
+      const { data } = await axios.post("http://localhost:3000/login", {
+        email: formData.email,
+        password: formData.password
+      }, config);
+      console.log("Login:", data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setUser(data);
+      navigate("/home");
+      toast({
+        title: 'Login Successfully',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
     }
     catch (err) {
       toast({
@@ -74,7 +94,8 @@ const Login = () => {
         flexDir={"column"}
         alignItems={"center"}
         w={"50%"}
-        h={"450px"}
+        h={"auto"}
+        p={5}
         border={"2px solid red"}
         borderRadius={10}
       >
@@ -87,15 +108,16 @@ const Login = () => {
 
         <FormControl>
           <FormLabel fontSize={"xl"} fontFamily={"Work sans"} m={3}  >Enter Email:</FormLabel>
-          <Input placeholder='enter email' value={email} type='text' m={1} w={"90%"} onChange={(e) => setEmail(e.target.value)} />
+          <Input placeholder='enter email' type='text' m={1} w={"90%"} {...register("email")} />
+          {errors.email && <Text m={2} color={"red"} >*{errors.email.message}</Text>}
         </FormControl>
 
         <FormControl>
           <FormLabel fontSize={"xl"} fontFamily={"Work sans"} m={3}  >Enter password:</FormLabel>
-          <InputGroup size='md' w={"90%"} value={password}>
+          <InputGroup size='md' w={"90%"} >
             <Input
               type={show ? 'text' : 'password'}
-              placeholder='enter password' onChange={(e) => setPassword(e.target.value)}
+              placeholder='enter password' {...register("password")}
             />
             <InputRightElement width='4.5rem'>
               <Button h='1.75rem' size='sm' onClick={() => setShow(!show)}>
@@ -103,14 +125,16 @@ const Login = () => {
               </Button>
             </InputRightElement>
           </InputGroup>
+          {errors.password && <Text m={2} color={"red"} >*{errors.password.message}</Text>}
         </FormControl>
         <Text>
-          If not have account{' '}
+          If do not have account{' '}
           <Link color='teal.500' href='http://localhost:5173/register'>
             sign in
           </Link>
         </Text>
-        <Button m={6} onClick={loginUser} >Login</Button>
+        <Button m={6} onClick={handleSubmit(loginUser)} isDisabled={isSubmitting ? true : false} >{isSubmitting ? "Logging..." : "Login"}</Button>
+        <Text>{errors.root && errors.root.message}</Text>
       </Box>
     </Box>
   )
