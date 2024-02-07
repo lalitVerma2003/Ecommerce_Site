@@ -29,20 +29,14 @@ export async function allProducts(req, res) {
 }
 
 export async function showProduct(req, res) {
-    const product = await Product.findById(req.params.id).populate({
-        path: 'reviews', populate: {
-            path: 'owner'
-        }
-    }).populate('owner');
+    const product = await Product.findById(req.params.id).populate("reviews").populate('reviews.owner','owner');
     // console.log(product);
-    // res.render('products/showOne',{product});
     res.status(200).json(product);
 }
 
 export async function createProduct(req, res) {
     const { name, description, price, brand, category } = req.body;
     const images=req.files;
-    // console.log(req.body,images);
     const newProduct = new Product({ name, description, price, brand, category });
     newProduct.owner = req.user;
     const newImages = images.map((img) => {

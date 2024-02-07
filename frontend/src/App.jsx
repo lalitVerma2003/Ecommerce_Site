@@ -16,32 +16,28 @@ import {
 } from "react-router-dom";
 import DataProvider from './config/DataProvider.jsx';
 import DetailProduct from './Components/Product/DetailProduct.jsx';
-import AdminProducts from './Components/Product/AdminProducts.jsx';
-// import Checkout from './Components/Checkout.jsx';
-// import CheckoutSuccess from './Components/C/heckoutSuccess.jsx';
+import ProtectedRoute from './Components/ProtectedRoute.jsx';
+import MyOrders from './Components/MyOrders.jsx';
 
 
 function App() {
 
   return (
-      <Router>
-        {/* Routes are starting from here */}
-        <DataProvider>
+    <Router>
+      <DataProvider>
         <Routes>
-          <Route path={'/home'}  element={<Home />} />
-          {/* <Route path={'/admin/products'} element={<AdminProducts />} /> */}
-          <Route path={'/products/new'} element={<NewProduct />} />
-          <Route path={'/about'} element={<About />} />
           <Route path={'/register'} element={<Register />} />
-          {/* <Route path='success-checkout' element={<CheckoutSuccess/>} /> */}
           <Route path={'/login'} element={<Login />} />
-          <Route path={'/cart'} element={<Cart />} />
-          <Route path="/products/:productId" element={<DetailProduct/>} />
+          <Route path={'/home'} element={<ProtectedRoute component={<Home/>} />} />
+          <Route path={'/cart'} element={<ProtectedRoute component={<Cart/>} />} />
+          <Route path={'/about'} element={<ProtectedRoute component={<About/>} />} />
+          <Route path="/products/:productId" element={<ProtectedRoute component={<DetailProduct/>} />} />
+          <Route path={'/products/new'} element={<ProtectedRoute component={<NewProduct/>} />} />
+          <Route path={'/myorders'} element={<ProtectedRoute component={<MyOrders/>} />} />
           <Route path="*" element={<Error />} />
         </Routes>
-        </DataProvider>
-
-      </Router>
+      </DataProvider>
+    </Router>
   )
 }
 

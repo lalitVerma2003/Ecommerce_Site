@@ -5,10 +5,10 @@ export async function createReview(req,res){
     const {id}=req.params;
     const product=await Product.findById(id);
     const review=new Review(req.body);
+    review.owner=req.user;
     product.reviews.push(review);
     await review.save();
     await product.save();
-    console.log(product);
     res.status(200).json(review);
 }
 

@@ -5,6 +5,14 @@ import { DataState } from '../../config/DataProvider';
 import { useParams, Link } from 'react-router-dom';
 import PayButton from './PayButton';
 import axios from 'axios';
+import CartItem from './CartItem';
+import {
+  Flex,
+  Heading,
+  HStack,
+  Stack,
+  useColorModeValue as mode,
+} from '@chakra-ui/react'
 import {
   Table,
   Thead,
@@ -21,9 +29,6 @@ const CartProduct = ({ fetchAgain, setFetchAgain }) => {
 
   const { user, cart, setCart } = DataState();
   const toast = useToast();
-
-  useEffect(() => {
-  }, []);
 
   const handleCart = async (e) => {
     // console.log(e.target.outerText);
@@ -99,9 +104,23 @@ const CartProduct = ({ fetchAgain, setFetchAgain }) => {
 
   return (
     <>
-      <TableContainer
+      <Box
+        w={"100%"}
+        h={"auto"}
+        border={"2px solid black"}
+        // display={{base:"flex",md:"none"}}
+      >
+        <Stack spacing="6" w={"70%"} m={"auto"} >
+          {cart?.map((item, id) => (
+            <CartItem key={id} {...item} />
+          ))}
+        </Stack>
+      </Box>
+
+      {/* <TableContainer
         w={"90%"}
         boxSizing="border-box"
+        // display={{base:"none",md:"flex"}}
       >
         <Table variant='simple' w={"100%"} >
           <Thead
@@ -143,8 +162,8 @@ const CartProduct = ({ fetchAgain, setFetchAgain }) => {
             )}
           </Tbody>
         </Table>
-      </TableContainer>
-      <PayButton />
+      </TableContainer> */}
+      <PayButton products={cart} />
     </>
   )
 }

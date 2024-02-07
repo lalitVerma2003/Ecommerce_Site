@@ -8,11 +8,11 @@ const upload = multer({ storage: storage });
 
 router.get('/all',checkAuth,allProducts);
 
-router.get('/:id',showProduct)
+router.get('/:id',checkAuth,showProduct);
 
 router.post('/new',checkAuth,checkAdmin,upload.array("images",5),createProduct);
 
-router.put('/:id',checkAuth,checkOwner,updateProduct)
+router.put('/:id',checkAuth,checkOwner,updateProduct);
 
 router.delete('/:id',checkAuth,checkOwner,deleteProduct);
 

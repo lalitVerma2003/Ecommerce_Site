@@ -1,90 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Button, Text } from '@chakra-ui/react';
 import { Select } from '@chakra-ui/react'
 import { useSearchParams } from 'react-router-dom';
-import { IconButton, Checkbox } from '@chakra-ui/react';
+import { IconButton, Checkbox, CheckboxGroup, VStack } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 
 
-const Categories = ({ fetchAgain, setFetchAgain }) => {
 
-  const [searchParams, setSearchParams] = useSearchParams();
+const Categories = ({ brand, setBrand, category, setCategory }) => {
+
+  
   const [isBrand, setIsBrand] = useState(true);
   const [isCategory, setIsCategory] = useState(true);
-  const brands = ["Apple", "Oppo", "Sansung", "Nike", "Boat"];
-  const categories=["Headphone","Phone","Shirt","Airpods"];
-
-  useEffect(() => {
-    setFetchAgain(!fetchAgain);
-    setSearchParams("");
-  }, []);
+  const brands = ["Apple", "Oppo", "Samsung", "Nike", "Boat"];
+  const categories = ["Headphone", "Phone", "Shirt", "Airpods"];
 
   const handleBrandChange = (e) => {
-    console.log("Brand", e.target.value);
-    setSearchParams(...searchParams, { brand: e.target.value });
-    setFetchAgain(!fetchAgain);
+    setBrand(e.target.value == brand ? null : e.target.value);
   }
 
   const handleCategoryChange = (e) => {
-    console.log("Category", e.target.value);
-    setSearchParams({ category: e.target.value });
-    setFetchAgain(!fetchAgain);
+    setCategory(e.target.value == category ? null : e.target.value);
+  }
+
+  const resetFilter=()=>{
+    setBrand(null);
+    setCategory(null);
   }
 
   return (
-    <Box
-      display={"flex"}
-      flexDir={"column"}
-      // alignItems={"center"}
-      w={"20%"}
-      border={"2px solid #f4e5e7"}
-      h={"150vh"}
-      py={10}
-    >
-      <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        m={3}
-        p={3}
-        borderBottom={"2px solid #f4e5e7"}
-      >
-        <Text fontSize={"2xl"} fontFamily={"Work sans"} p={1} >Brands :</Text>
-        {isBrand ? (
-          <IconButton icon={<AddIcon />} boxSize={"6"} m={2} onClick={() => setIsBrand(!isBrand)} />
-        ) : (
-          <IconButton as={"button"} icon={<MinusIcon />} boxSize={"6"} m={2} onClick={() => setIsBrand(!isBrand)} />
-        )}
-      </Box>
-      {!isBrand && <Box
+    <>
+        <Box
+          display={"flex"}
+          justifyContent={"space-between"}
+          w={"100%"}
+          m={3}
+          p={3}
+          borderBottom={"2px solid #f4e5e7"}
+        >
+          <Button w={"100%"} borderRadius={20} fontSize={"2xl"} fontFamily={"sans-serif"} p={1} onClick={() => setIsBrand(!isBrand)} >Filter by brand</Button>
+        
+        {!isBrand && <Box
           display={"flex"}
           flexDir={"column"}
           p={3}
-      >
-        {brands.map((brand, id) => <Checkbox key={id} size={"lg"} fontSize={"1xl"} fontFamily={"Work sans"} m={1} >{brand}</Checkbox>)}
-      </Box>}
+        >
+          {brands.map((b, id) => <Checkbox key={id} size={"lg"} value={b} fontSize={"1xl"} fontFamily={"Work sans"} m={1} onChange={(e) => handleBrandChange(e)} isChecked={brand === b} >{b}</Checkbox>)}
+        </Box>}
+        </Box>
 
-      <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        m={3}
-        p={3}
-        borderBottom={"2px solid #f4e5e7"}
-      >
-        <Text fontSize={"2xl"} fontFamily={"Work sans"} p={1} >Categories :</Text>
-        {isCategory ? (
-          <IconButton icon={<AddIcon />} boxSize={"6"} m={2} onClick={() => setIsCategory(!isCategory)} />
-        ) : (
-          <IconButton as={"button"} icon={<MinusIcon />} boxSize={"6"} m={2} onClick={() => setIsCategory(!isCategory)} />
-        )}
-      </Box>
-      {!isCategory && <Box
+        <Box
+          display={"flex"}
+          justifyContent={"space-between"}
+          m={3}
+          p={3}
+          w={"100%"}
+          borderBottom={"2px solid #f4e5e7"}
+        >
+          <Button w={"100%"} borderRadius={20} fontSize={"2xl"} fontFamily={"sans-serif"} p={1} onClick={() => setIsCategory(!isCategory)} >Filter by category</Button>
+        
+        {!isCategory && <Box
           display={"flex"}
           flexDir={"column"}
           p={3}
-      >
-        {categories.map((category, id) => <Checkbox key={id} size={"lg"} fontSize={"1xl"} fontFamily={"Work sans"} m={1} >{category}</Checkbox>)}
-      </Box>}
-    </Box>
+        >
+          {categories.map((c, id) => <Checkbox key={id} size={"lg"} value={c} fontSize={"1xl"} fontFamily={"Work sans"} m={1} onChange={(e) => handleCategoryChange(e)} isChecked={category === c} >{c}</Checkbox>)}
+        </Box>}
+        </Box>
+        <Button w={"60%"} onClick={resetFilter} >Remove all filters</Button>
+    </>
   )
 }
 

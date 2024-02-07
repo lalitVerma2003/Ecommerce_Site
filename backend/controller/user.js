@@ -1,11 +1,23 @@
 import User  from '../models/user.js';
 import bcrypt from 'bcryptjs';
+import Joi from 'joi';
 import { generateToken } from '../utils/generateToken.js';
 
+const userSchema=Joi.object({
+    username: Joi.string().min(2).required(),
+    password: Joi.string().min(2).required(),
+    email: Joi.string().email().required(),
+    role: Joi.string().min(2).valid('admin','user').required()
+});
 
 export async function createUser(req,res){
     
-    const{username,password,email,role}=req.body;
+    const {error,value}=userSchema.validate(req.body);
+    if(error){
+        return res.json({ error: error.details[0].message });
+    }
+
+    const{username,password,email,role}=value;
     const user=await User.findOne({email});
     if(user){
         const token=generateToken(user._id);
@@ -20,10 +32,8 @@ export async function createUser(req,res){
         role,
     });
     await newUser.save();
-    // console.log(newUser);
     if(newUser){
         const token=generateToken(newUser._id);
-        // console.log("Logged in token ",token);
         res.cookie("token", token, { httpOnly: true }).json({
             username,
             email,
@@ -36,12 +46,16 @@ export async function createUser(req,res){
 }
 
 export async function login(req,res){
-    const {email,password}=req.body;
+
+    // const {error,value}=userSchema.validate(req.body);
+    // if(error){
+    //     return res.json({ error: error.details[0].message });
+    // }
+    const{password,email}=req.body;
     const user=await User.findOne({email:email});
 
     if(user&&(await user.matchPassword(password))){
         const token=generateToken(user._id);
-        // console.log("Logged in token ",token);
         res.cookie("token", token, { httpOnly: true }).json({
             name:user.name,
             email:user.email,

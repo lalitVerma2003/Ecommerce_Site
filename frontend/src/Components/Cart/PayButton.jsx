@@ -5,7 +5,7 @@ import { DataState } from '../../config/DataProvider'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 
-const PayButton = () => {
+const PayButton = ({products}) => {
 
   const [total, setTotal] = useState("");
   const { user, cart, setCart } = DataState();

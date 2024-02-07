@@ -13,17 +13,16 @@ const NavbarItems = ({fontSize}) => {
     const logOut = async () => {
         localStorage.removeItem("userInfo");
         const { data } = await axios.get("http://localhost:3000/logout");
-        console.log("Log out", data);
         navigate("/login");
     }
 
     return (
         <>
             <ChakraLink as={RouterLink} to={'/home'} >
-                {user.role === "admin" ? <NavbarItem itemName="My products" fontSize={fontSize} /> : <NavbarItem itemName="Home" fontSize={fontSize} />}
+                {user?.role === "admin" ? <NavbarItem itemName="My products" fontSize={fontSize} /> : <NavbarItem itemName="Home" fontSize={fontSize} />}
             </ChakraLink>
 
-            {user.role === "admin" ?
+            {user?.role === "admin" ?
                 <ChakraLink as={RouterLink} to={'/products/new'} >
                     <NavbarItem itemName="New Product" fontSize={fontSize} />
                 </ChakraLink> :
@@ -35,8 +34,8 @@ const NavbarItems = ({fontSize}) => {
                 Login
             </ChakraLink> :
                 <>
-                    {user.role === "admin" ? <ChakraLink as={RouterLink} to={'/checkout'} >
-                        <NavbarItem itemName="Check out" fontSize={fontSize} />
+                    {user?.role === "admin" ? <ChakraLink as={RouterLink} to={'/myorders'} >
+                        <NavbarItem itemName="My Orders" fontSize={fontSize} />
                     </ChakraLink> : <ChakraLink as={RouterLink} to={'/cart'} >
                         <NavbarItem itemName="Cart" fontSize={fontSize} />
                     </ChakraLink>}

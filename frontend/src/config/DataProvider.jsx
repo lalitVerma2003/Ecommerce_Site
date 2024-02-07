@@ -10,13 +10,10 @@ const DataProvider=({children})=>{
     const navigate=useNavigate();
 
     useEffect(()=>{
-        console.log("Setting user...");
         const userInfo=JSON.parse(localStorage.getItem("userInfo"));
         setUser(userInfo);
-        // if(!userInfo){
-        //     navigate("/register");
-        // }
-    },[navigate])
+        // console.log("Datastate");
+    },[navigate]);
 
     return (
         <DataContext.Provider value={{user,setUser,productData,setProductData,cart,setCart}}>{children}</DataContext.Provider>

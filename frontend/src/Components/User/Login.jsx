@@ -44,7 +44,7 @@ const Login = () => {
   useEffect(() => {
     const user = localStorage.getItem("userInfo");
     if (user) {
-      navigate('/home');
+      navigate("/home");
     }
   })
 
