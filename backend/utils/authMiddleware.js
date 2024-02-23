@@ -6,10 +6,9 @@ import Product from '../models/products.js';
 
 const checkAuth=async(req,res,next)=>{
     let token;
-    // console.log(req.headers.authorization);
     token=req.cookies.token;
     if(!token){
-        res.status(400).send("no token available");
+        return res.status(400).send("no token available");
     }
     try{
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
@@ -17,10 +16,9 @@ const checkAuth=async(req,res,next)=>{
         next();
     }
     catch(err){
-        // If jwt token expired
         console.log("Token expired");
         res.clearCookie("token");
-        res.status(400).send("Token expired");
+        return res.status(400).send("Token expired");
     }
 }
 

@@ -21,7 +21,7 @@ export async function addCart(req, res) {
     }
     const newCart = new Cart({ quantity: 1, product, user });
     await newCart.save();
-    res.status(200).json("Added in cart Successfully");
+    res.status(200).json(newCart);
 }
 
 export async function deleteCart(req, res) {

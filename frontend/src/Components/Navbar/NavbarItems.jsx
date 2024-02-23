@@ -2,17 +2,18 @@ import React from 'react'
 import { Link as ChakraLink } from "@chakra-ui/react";
 import NavbarItem from "./NavbarItem";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { DataState } from "../../config/DataProvider";
 import axios from "axios";
+import { useDispatch, useSelector } from 'react-redux';
+import { logOut } from '../../store/userSlice/userSlice';
 
 const NavbarItems = ({fontSize}) => {
 
-    const { user } = DataState();
+    const user=useSelector(state=> state.user.user);
+    const dispatch=useDispatch();
     const navigate=useNavigate();
 
-    const logOut = async () => {
-        localStorage.removeItem("userInfo");
-        const { data } = await axios.get("http://localhost:3000/logout");
+    const logout = async () => {
+        dispatch(logOut());
         navigate("/login");
     }
 
@@ -29,7 +30,9 @@ const NavbarItems = ({fontSize}) => {
                 <ChakraLink as={RouterLink} to={'/about'} >
                     <NavbarItem itemName="About" fontSize={fontSize} />
                 </ChakraLink>}
-
+            <ChakraLink as={RouterLink} to={"/orders"} >
+                <NavbarItem itemName={"My orders"} fontSize={fontSize} />
+            </ChakraLink>
             {!user ? <ChakraLink as={RouterLink} to={'/login'} >
                 Login
             </ChakraLink> :
@@ -41,7 +44,7 @@ const NavbarItems = ({fontSize}) => {
                     </ChakraLink>}
                 </>
             }
-            <ChakraLink onClick={logOut} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></ChakraLink>
+            <ChakraLink onClick={logout} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></ChakraLink>
         </>
     )
 }

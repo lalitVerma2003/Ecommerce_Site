@@ -3,9 +3,10 @@ import { Box, Input, Button, FormControl, FormLabel, useToast, InputGroup, Input
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios'
-import { DataState } from '../../config/DataProvider';
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSelector, useDispatch } from "react-redux";
+import { login } from '../../store/userSlice/userSlice';
 
 axios.defaults.withCredentials = true;
 const schema = z.object({
@@ -14,13 +15,13 @@ const schema = z.object({
     .string()
     .min(4)
     .max(20)
-    .refine((value)=> /[A-Z]/.test(value),{
-        message: 'Password must contain at least one uppercase letter'
+    .refine((value) => /[A-Z]/.test(value), {
+      message: 'Password must contain at least one uppercase letter'
     })
-    .refine((value)=> /[a-z]/.test(value),{
+    .refine((value) => /[a-z]/.test(value), {
       message: 'Password must contain at least one lowercase letter'
     })
-    .refine((value)=> /\d/.test(value),{
+    .refine((value) => /\d/.test(value), {
       message: 'Password must contain at least one digit',
     })
     .refine((value) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value), {
@@ -29,17 +30,15 @@ const schema = z.object({
 });
 
 const Login = () => {
-  const [show, setShow] = useState(false);
+  const show = useSelector(state => state.user.loading);
   const toast = useToast();
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
-
-  const { setUser } = DataState();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const user = localStorage.getItem("userInfo");
@@ -49,28 +48,15 @@ const Login = () => {
   })
 
   const loginUser = async (formData) => {
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        }
-      }
-      const { data } = await axios.post("http://localhost:3000/login", {
-        email: formData.email,
-        password: formData.password
-      }, config);
-      console.log("Login:", data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setUser(data);
-      navigate("/home");
+    dispatch(login({ email: formData.email, password: formData.password }));
+    if (!show) {
       toast({
         title: 'Login Successfully',
         status: 'success',
         duration: 5000,
         isClosable: true,
       })
-    }
-    catch (err) {
+    } else {
       toast({
         title: 'Error Occured',
         description: "Username or Password is incorrect",
@@ -133,7 +119,7 @@ const Login = () => {
             sign in
           </Link>
         </Text>
-        <Button m={6} onClick={handleSubmit(loginUser)} isDisabled={isSubmitting ? true : false} >{isSubmitting ? "Logging..." : "Login"}</Button>
+        <Button m={6} onClick={handleSubmit(loginUser)} isDisabled={show ? true : false} >{show ? "Logging..." : "Login"}</Button>
         <Text>{errors.root && errors.root.message}</Text>
       </Box>
     </Box>

@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Image, Text, VStack } from "@chakra-ui/react";
 import { ArrowForwardIcon } from '@chakra-ui/icons';
-import DetailProduct from "./DetailProduct";
-import { FaHeart, FaHeartbeat } from 'react-icons/fa';
 
 function Product({ product }) {
     const navigate = useNavigate();

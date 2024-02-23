@@ -20,18 +20,31 @@ const orderSchema = new mongoose.Schema({
     ],
     shippingInfo: {
         name: { type: String },
-        address: { type: String },
-        code: { type: String },
-        city: { type: String },
+        address: { 
+            city:{type:String},
+            country:{type:String},
+            state:{type:String},
+            postal_code:{type:String}
+         },
         email: { type: String },
     },
-    paymentDetails: {
-        paymentMethod: { type: String }
+    paymentIntentId:{
+        type: String,
+    },
+    payment_status:{
+        type:String
+    },
+    delivery_status:{
+        type:String,
+        default: "pending"
     },
     totalCost: {
         type: Number
     }
-})
+},
+{
+    timestamps: true
+});
 
 const Order = mongoose.model("Order", orderSchema);
 

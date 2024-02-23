@@ -1,36 +1,31 @@
-import { Box, Button, VStack } from "@chakra-ui/react";
-import Navbar from "../Navbar/Navbar";
 import { useEffect, useState } from "react";
-import { DataState } from "../../config/DataProvider";
+import { Box, Button,  Spinner, Text } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Text, Image } from "@chakra-ui/react";
 import CartProduct from "./CartProduct";
-import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCartProducts } from "../../store/cartSlice/cartSlice";
 
 axios.defaults.withCredentials = true;
 
 function Cart() {
 
     const [fetchAgain, setFetchAgain] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const { user, cart, setCart } = DataState();
+    const user=useSelector(state=> state.user.user);
+    const {cartData,loading}=useSelector(state=> state.cart);
+    const dispatch=useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!user) {
-            // console.log("After");
             return;
         }
         getCartProducts();
-    }, [user, fetchAgain]);
+    }, [fetchAgain]);
 
     const getCartProducts = async () => {
-        // console.log("Function called");
-        setLoading(true);
-        const { data } = await axios.get("http://localhost:3000/cart/show");
-        console.log(data);
-        setCart(data);
-        setLoading(false);
+        dispatch(fetchCartProducts());
     }
 
     return (
@@ -41,7 +36,7 @@ function Cart() {
             margin={"auto"}
         >
             <Navbar />
-            <Text fontSize={"5xl"} fontFamily={"inherit"} w={"40%"} m={"auto"} textAlign={"center"} p={10} >Shopping Cart</Text>
+            <Text fontSize={"5xl"} fontFamily={"inherit"} w={{sm:"90%",md:"60%",lg:"40%"}} m={"auto"} textAlign={"center"} p={10} >Shopping Cart</Text>
             <Box
                 display={"flex"}
                 flexDir={"column"}
@@ -51,8 +46,8 @@ function Cart() {
                 h={"auto"}
             >
                 {loading ? (
-                    <Text>loading</Text>
-                ) : cart.length !== 0 ?
+                    <Spinner />
+                ) : cartData.length !== 0 ?
                     (
                         <CartProduct fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
                     )

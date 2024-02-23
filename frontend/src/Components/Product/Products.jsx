@@ -1,87 +1,66 @@
 import React, { useEffect, useState } from 'react'
-import { DataState } from '../../config/DataProvider';
+import { Box, Button, Text, HStack, useToast, Select, useDisclosure, Drawer, DrawerBody, DrawerOverlay, DrawerContent, DrawerCloseButton, } from '@chakra-ui/react';
+import { FaFilter } from 'react-icons/fa';
+
 import axios from 'axios';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Button, Text, useToast } from '@chakra-ui/react';
 import Categories from './Categories';
 import Product from './Product';
-import { FaFilter } from 'react-icons/fa';
-import { useDisclosure } from '@chakra-ui/react';
-import {
-    Drawer,
-    DrawerBody,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerCloseButton,
-} from '@chakra-ui/react'
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts } from '../../store/productSlice/productSlice';
+import Pagination from './Pagination';
 
 axios.defaults.withCredentials = true;
 
 const Products = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [loading, setLoading] = useState(true);
     const [brand, setBrand] = useState(null);
     const [category, setCategory] = useState(null);
     const [page, setPage] = useState(1);
-    const [totalData, setTotalData] = useState();
-    const limit = 9;
-
-    const { user, productData, setProductData } = DataState();
+    const { productData, loading, error } = useSelector(state => state.product);
+    const dispatch = useDispatch();
+    const [sortMethod, setSortMethod] = useState(() => () => { });
     const toast = useToast();
+    const limit = 9;
 
     useEffect(() => {
         getData();
     }, [page, brand, category]);
 
-    useEffect(()=>{
-        const handleSize=()=>{
-            if(window.innerWidth>=992)
+    useEffect(() => {
+        const handleSize = () => {
+            if (window.innerWidth >= 992)
                 onClose();
         }
-        window.addEventListener("resize",handleSize);
-        return ()=>{
-            window.removeEventListener("resize",handleSize);
+        window.addEventListener("resize", handleSize);
+        return () => {
+            window.removeEventListener("resize", handleSize);
         }
-      },[]);
+    }, []);
 
     const getData = async () => {
-        try {
-            if (!user) {
-                return;
-            }
-            const queryParams = new URLSearchParams();
-            if (brand)
-                queryParams.append("brand", brand);
-            if (category)
-                queryParams.append("category", category);
-            const { data } = await axios.get(`http://localhost:3000/products/all?${queryParams.toString()}&page=${page}&limit=${limit}`);
-            if (data.length != 0)
-                setProductData(data.productData);
-            setTotalData(data.total);
-            setLoading(false);
-        }
-        catch (err) {
+        const queryParams = new URLSearchParams();
+        if (brand)
+            queryParams.append("brand", brand);
+        if (category)
+            queryParams.append("category", category);
+        dispatch(fetchProducts({ page: page, limit: 9, queryParams }));
+        if (error)
             toast({
-                title: 'Error while fetching products',
+                title: error,
                 status: 'error',
                 duration: 4000,
                 isClosable: true,
             })
-        }
     }
 
-    const handlePrevData = () => {
-        if (page == 1)
-            return;
-        setPage((page) => page - 1);
-    }
-
-    const handleNextData = () => {
-        if (page > totalData / limit)
-            return;
-        setPage((page) => page + 1);
+    const handleSorting = (e) => {
+        let s = e.target.value;
+        if (s == 'inc')
+            setSortMethod(() => (a, b) => a.price - b.price);
+        else if (s == 'dec')
+            setSortMethod(() => (a, b) => b.price - a.price);
+        else
+            setSortMethod(() => () => { });
     }
 
     return (
@@ -97,9 +76,9 @@ const Products = () => {
                 alignItems={"flex-end"}
                 w={"auto"}
                 h={"auto"}
-                mx={5}
+                m={3}
             >
-                <Button display={{ base: "block", lg: "none" }} my={4} fontSize={"2xl"} fontFamily={"serif"} onClick={onOpen} borderRadius={"50%"} ><FaFilter color='#38b6ff'/></Button>
+                <Button display={{ base: "block", lg: "none" }} my={4} fontSize={"2xl"} fontFamily={"serif"} onClick={onOpen} borderRadius={"50%"} ><FaFilter color='#38b6ff' /></Button>
                 <Drawer
                     isOpen={isOpen}
                     placement='left'
@@ -124,11 +103,20 @@ const Products = () => {
                     fontWeight={"bold"}
                     mt={10}
                 >All Products</Text>
-                <Text
-                    fontSize={'3xl'}
-                    fontFamily={"Work sans"}
-                    mt={10}
-                >Sort by</Text>
+                <HStack
+                    w={{ md: "30%", lg: "20%" }}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                >
+                    <Text
+                        fontSize={"2rem"}
+                        fontFamily={"Work sans"}
+                    >Sort by:</Text>
+                    <Select placeholder='No Filter' onChange={(e) => handleSorting(e)} w={"50%"} >
+                        <option value='inc'>Price: low to high</option>
+                        <option value='dec'>Price: high to low</option>
+                    </Select>
+                </HStack>
             </Box>
             <Box
                 display={"flex"}
@@ -154,37 +142,10 @@ const Products = () => {
                     py={1}
                     border={"2px solid #f4e5e7"}
                 >
-                    {productData.map((p, i) => <Product key={i} product={p} />)}
+                    {productData.toSorted(sortMethod).map((p, i) => <Product key={i} product={p} />)}
                 </Box>
             </Box>
-            <Box
-                w={"90%"}
-                h={"auto"}
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                m={"auto"}
-                my={5}
-            >
-                <Box
-                    display={"flex"}
-                    justifyContent={"space-around"}
-                    w={"40%"}
-                    h={"auto"}
-                    backgroundColor={"#edf2f7"}
-                >
-                    <Button onClick={handlePrevData} mx={5} >prev</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={1} >1</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={2} >2</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={3} >3</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={4} >4</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={5} >5</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={6} >6</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={0} >...</Button>
-                    <Button onClick={(e) => setPage(e.target.value)} value={`${Math.floor(totalData / limit) + 1}`} >{Math.floor(totalData / limit) + 1}</Button>
-                    <Button onClick={handleNextData} mx={5} >next</Button>
-                </Box>
-            </Box>
+            <Pagination page={page} setPage={setPage} limit={9} />
         </Box>
     )
 }

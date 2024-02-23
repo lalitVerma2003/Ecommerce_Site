@@ -1,19 +1,18 @@
 import React, { useEffect } from 'react';
-import { DataState } from '../config/DataProvider';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const ProtectedRoute = ({component}) => {
 
-    const {user}=DataState() || JSON.parse(localStorage.getItem("userInfo"));
+    const user=useSelector(state=> state.user.user);
     const navigate=useNavigate();
 
     useEffect(()=>{
-        if(!user){
+        if(user===null){
             return navigate("/login");
         }
-        // console.log("Protected");
     },[user]);
-  return component;
+  return user&&component;
 }
 
 export default ProtectedRoute;

@@ -51,6 +51,7 @@ export async function login(req,res){
     // if(error){
     //     return res.json({ error: error.details[0].message });
     // }
+    // console.log("Log in",req.body);
     const{password,email}=req.body;
     const user=await User.findOne({email:email});
 

@@ -19,6 +19,7 @@ import productsRoutes from './routes/product.js';
 import reviewRoutes from './routes/review.js';
 import cartRoutes from './routes/cart.js';
 import checkRoutes from './routes/checkout.js';
+import orderRoutes from './routes/order.js';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +34,7 @@ app.use('/products', productsRoutes);
 app.use('/products/:id/reviews', reviewRoutes);
 app.use('/cart', cartRoutes);
 app.use('/',checkRoutes);
+app.use('/',orderRoutes);
 
 app.listen(3000, () => {
     console.log("Request Listen");

@@ -30,10 +30,10 @@ const Categories = ({ brand, setBrand, category, setCategory }) => {
 
   return (
     <>
-        <Box
-          display={"flex"}
+        <VStack
+          alignItems={"flex-start"}
           justifyContent={"space-between"}
-          w={"100%"}
+          w={"90%"}
           m={3}
           p={3}
           borderBottom={"2px solid #f4e5e7"}
@@ -47,14 +47,14 @@ const Categories = ({ brand, setBrand, category, setCategory }) => {
         >
           {brands.map((b, id) => <Checkbox key={id} size={"lg"} value={b} fontSize={"1xl"} fontFamily={"Work sans"} m={1} onChange={(e) => handleBrandChange(e)} isChecked={brand === b} >{b}</Checkbox>)}
         </Box>}
-        </Box>
+        </VStack>
 
-        <Box
-          display={"flex"}
+        <VStack
+          alignItems={"flex-start"}
           justifyContent={"space-between"}
           m={3}
           p={3}
-          w={"100%"}
+          w={"90%"}
           borderBottom={"2px solid #f4e5e7"}
         >
           <Button w={"100%"} borderRadius={20} fontSize={"2xl"} fontFamily={"sans-serif"} p={1} onClick={() => setIsCategory(!isCategory)} >Filter by category</Button>
@@ -66,7 +66,7 @@ const Categories = ({ brand, setBrand, category, setCategory }) => {
         >
           {categories.map((c, id) => <Checkbox key={id} size={"lg"} value={c} fontSize={"1xl"} fontFamily={"Work sans"} m={1} onChange={(e) => handleCategoryChange(e)} isChecked={category === c} >{c}</Checkbox>)}
         </Box>}
-        </Box>
+        </VStack>
         <Button w={"60%"} onClick={resetFilter} >Remove all filters</Button>
     </>
   )

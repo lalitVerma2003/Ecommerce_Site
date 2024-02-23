@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
-import { HStack, VStack, FormControl, FormLabel, Textarea, Text, Select, Button, useToast } from '@chakra-ui/react'
+import { HStack, VStack, FormControl, FormLabel, Textarea, Text, Select, Button, useToast, Box } from '@chakra-ui/react'
 import { IoIosStar, IoIosStarOutline } from 'react-icons/io';
 import axios from 'axios';
 
@@ -10,6 +10,7 @@ const Review = ({ product, setFetch }) => {
     const [rating, setRating] = useState(1);
     const [comment, setComment] = useState("");
     const toast = useToast();
+    // console.log(product);
 
     const handleReview = async () => {
         try {
@@ -40,25 +41,26 @@ const Review = ({ product, setFetch }) => {
 
     return (
         <>
-            <HStack
-                w={"80%"}
+            <Box
+                display={"flex"}
+                flexDir={{ base: "column", lg: "row" }}
+                w={{ base: "100%", lg: "80%" }}
                 h={"auto"}
-                m={5}
+                my={5}
                 p={5}
                 justifyContent={"space-evenly"}
-                alignItems={"flex-start"}
-            // border={"2px solid green"}
+                alignItems={{base:"center",lg:"flex-start"}}
+                // border={"2px solid red"}
             >
                 <VStack
-                    w={"30%"}
-                // border={"2px solid red"}
+                    w={{base:"90%",sm:"70%",md:"50%",lg:"30%"}}
+                    mt={10}
                 >
-                    <Button fontSize={"2xl"} fontFamily={"sans-serif"} m={2} onClick={() => setShow(true)} >Write your review</Button>
-                    <Button fontSize={"2xl"} fontFamily={"sans-serif"} m={2} onClick={() => setShow(false)} >All reviews</Button>
+                    <Button fontSize={"2xl"} fontFamily={"sans-serif"} m={2} onClick={() => setShow(true)} colorScheme='cyan' variant={!show? 'outline' : 'solid'} >Write your review</Button>
+                    <Button fontSize={"2xl"} fontFamily={"sans-serif"} m={2} onClick={() => setShow(false)} colorScheme='cyan' variant={show? 'outline' : 'solid'} >All reviews</Button>
                 </VStack>
                 <VStack
-                    w={"50%"}
-                // border={"2px solid red"}
+                    w={{base:"90%",sm:"80%",md:"70%",lg:"50%"}}
                 >
                     {show ? (<VStack
                         w={"100%"}
@@ -84,16 +86,18 @@ const Review = ({ product, setFetch }) => {
                             w={"100%"}
                             p={2}
                         >
-                            {product.reviews.map((rev, id) =>
+                            {product.reviews.length===0?(
+                                <Text fontSize={"3xl"} fontFamily={"sans-serif"} m={5} >Yet no reviews for this product!!</Text>
+                            ):product.reviews.toReversed().map((rev, id) =>
                                 <VStack key={id} w={"100%"} alignItems={"flex-start"} border={"2px solid #f4e5e7"} borderRadius={10} p={3} >
                                     <Text fontSize={"1xl"} fontFamily={"sans-serif"} >~{rev.owner ? `${rev.owner.name}` : "Unknown"}</Text>
                                     <Text fontSize={"1xl"} fontFamily={"sans-serif"} >{rev.body}</Text>
                                     <HStack>
-                                        {Array.from({length:rev.rating }, (_, index) => (
-                                        <IoIosStar key={index} color="#FFD700" size={20} />
+                                        {Array.from({ length: rev.rating }, (_, index) => (
+                                            <IoIosStar key={index} color="#FFD700" size={20} />
                                         ))}
-                                        {Array.from({length:5-rev.rating }, (_, index) => (
-                                        <IoIosStarOutline key={index} color="#D3D3D3" size={20} />
+                                        {Array.from({ length: 5 - rev.rating }, (_, index) => (
+                                            <IoIosStarOutline key={index} color="#D3D3D3" size={20} />
                                         ))}
                                     </HStack>
                                 </VStack>
@@ -101,7 +105,7 @@ const Review = ({ product, setFetch }) => {
                         </VStack>)
                     }
                 </VStack>
-            </HStack>
+            </Box>
         </>
     )
 }

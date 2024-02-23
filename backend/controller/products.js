@@ -3,8 +3,9 @@ import Cart from '../models/cart.js';
 
 export async function allProducts(req, res) {
     if (req.user.role === "admin") {
-        const products = await Product.find({ owner: req.user });
-        res.json(products);
+        const productData = await Product.find({ owner: req.user });
+        const total=productData.length;
+        return res.json({productData,total});
     }
     if (req.user.role === "user") {
         let productData = await Product.find({});
@@ -23,7 +24,6 @@ export async function allProducts(req, res) {
             limit=parseInt(limit,10);
             productData=productData.slice((page-1)*limit,(page-1)*limit+limit);
         }
-        // console.log(productData);
         res.status(200).json({productData,total});
     }
 }

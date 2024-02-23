@@ -2,12 +2,13 @@ import { Box, Button, HStack, Image, Text, VStack, useToast, Flex } from '@chakr
 import React, { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useNavigate,useParams } from 'react-router-dom';
-import { DataState } from '../../config/DataProvider';
 import Navbar from '../Navbar/Navbar';
 import axios from 'axios';
 import Review from './Review';
 import { IoIosStar } from 'react-icons/io';
-
+import { useSelector,useDispatch } from 'react-redux';
+import { fetchProductById } from '../../store/productSlice/productSliceById';
+import { addToCart } from '../../store/cartSlice/cartSlice';
 import {
   NumberInput,
   NumberInputField,
@@ -24,11 +25,12 @@ const DetailProduct = () => {
   const [imageIndex, setImageIndex] = useState(0);
   const [count, setCount] = useState(1);
   const { productId } = useParams();
-  const { user } = DataState();
+  const user=useSelector(state=> state.user.user);
   const navigate = useNavigate();
   const toast = useToast();
-  const [product, setProduct] = useState("");
   const[rating,setRating]=useState(1);
+  const {product,loading,error}=useSelector(state=> state.productById);
+  const dispatch=useDispatch();
 
   useEffect(() => {
     if (!user) {
@@ -45,38 +47,16 @@ const DetailProduct = () => {
       clearTimeout(timer);
     }
   }, [imageIndex, product]);
-  console.log(product);
 
   const getProduct = async () => {
-    try {
-      const { data } = await axios.get(`http://localhost:3000/products/${productId}`);
-      // console.log(data);
-      setProduct(data);
-      calculateRating();
-    }
-    catch (err) {
-      console.log("Error while fetching product");
-    }
+    dispatch(fetchProductById({productId}));
   }
 
-  const addToCart = async () => {
+  const addCart = async () => {
     if (!user) {
       return;
     }
-    try {
-
-      console.log("User in add cart", user);
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        }
-      }
-      const { data } = await axios.post(`http://localhost:3000/cart/addproduct/${productId}`, { quantity: count }, config);
-      console.log("Data added", data);
-    }
-    catch (err) {
-      console.log("Error in add to cart");
-    }
+    dispatch(addToCart({productId:productId,count:count}));
   }
 
   const deleteProduct = async () => {
@@ -139,18 +119,21 @@ const DetailProduct = () => {
       <Navbar />
       {product &&
         <VStack
-          alignItems={"flex-start"}
+          alignItems={"center"}
           w={"100%"}
-          // border={"2px solid red"}
+          // border={"2px solid green"}
         >
-          <HStack
-            // #f4e5e7
+          <Box
+            display={"flex"}
+            flexDir={{base:"column",md:"row"}}
+            justifyContent={"center"}
+            alignItems={"center"}
             w={"100%"}
             // border={"2px solid red"}
           >
             <Box
               display={"flex"}
-              w={"60%"}
+              w={{lg:"60%",md:"50%",base:"90%"}}
               h={"auto"}
               flexDir={"column"}
               border={"2px solid #f4e5e7"}
@@ -170,14 +153,13 @@ const DetailProduct = () => {
                   <Image src={img.url} alt="error" w={"100%"} h={"70vh"} m={2} key={i} display={imageIndex === i ? "block" : "none"} objectFit={"cover"} overflow={"hidden"} />
                 ))}
                 <Button position={"absolute"} ml={"85%"} onClick={handleNextImage} ><ChevronRightIcon /></Button>
-
               </Box>
             </Box>
 
             <Box
               display={"flex"}
               flexDir={"column"}
-              w={"40%"}
+              w={{md:"50%",lg:"40%",base:"90%"}}
               h={"auto"}
               boxSizing={"border-box"}
               border={"2px solid #f4e5e7"}
@@ -212,7 +194,7 @@ const DetailProduct = () => {
                     <Button onClick={updateProduct} backgroundColor={"#314cc2"} color={"white"} w={"40%"} h={"10vh"} fontSize={"2xl"} _hover={""} m={"auto"} >Update</Button>
                   </Box>
                 ) : (
-                  <Button onClick={addToCart} backgroundColor={"#314cc2"} color={"white"} w={"30%"} h={"auto"} p={4} fontSize={"2xl"} _hover={""} >Add to cart</Button>
+                  <Button onClick={addCart} backgroundColor={"#314cc2"} color={"white"} w={"30%"} h={"auto"} p={4} fontSize={"2xl"} _hover={""} >Add to cart</Button>
                 )}
                 <NumberInput size='md' maxW={24} defaultValue={1} min={1} onChange={(c) => setCount(c)}>
                   <NumberInputField />
@@ -223,7 +205,7 @@ const DetailProduct = () => {
                 </NumberInput>
               </Flex>
             </Box>
-          </HStack>
+          </Box>
           <Review product={product} setFetch={setFetch} />
         </VStack>}
     </Box>
