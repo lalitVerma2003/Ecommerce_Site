@@ -32,6 +32,7 @@ export const fetchProductById=createAsyncThunk(
     "productById/fetchProductById",
     async(params)=>{
         const {productId}=params;
+        console.log("H");
         const { data } = await axios.get(`http://localhost:3000/products/${productId}`);
         return data;
     }

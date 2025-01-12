@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Text, HStack, useToast, Select, useDisclosure, Drawer, DrawerBody, DrawerOverlay, DrawerContent, DrawerCloseButton, } from '@chakra-ui/react';
 import { FaFilter } from 'react-icons/fa';
-
 import axios from 'axios';
 import Categories from './Categories';
 import Product from './Product';
@@ -9,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchProducts } from '../../store/productSlice/productSlice';
 import Pagination from './Pagination';
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 const Products = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -138,7 +137,7 @@ const Products = () => {
                     flexWrap={"wrap"}
                     justifyContent={"space-evenly"}
                     w={{ base: "100%", lg: "80%" }}
-                    h={"auto"}
+                    h={"150vh"}
                     py={1}
                     border={"2px solid #f4e5e7"}
                 >

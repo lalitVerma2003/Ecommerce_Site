@@ -19,6 +19,7 @@ const cartSlice=createSlice({
         .addCase(fetchCartProducts.fulfilled,(state,action)=>{
             state.cartData=action.payload;
             state.loading=false;
+            console.log("Cart products");
         })
         .addCase(fetchCartProducts.rejected,(state)=>{
             state.loading=false;
@@ -26,6 +27,13 @@ const cartSlice=createSlice({
         })
         .addCase(incrementCartProduct.fulfilled,(state,action)=>{
             console.log("Incremented ",action.payload);
+            // const newCart=state.cartData.filter((cart)=>{
+            //     if(cart._id===action.payload._id)
+            //         return action.payload;
+            //     else    
+            //         return cart;
+            // })
+            // state.cartData=newCart;
         })
         .addCase(decrementCartProduct.fulfilled,(state,action)=>{
             console.log("Decremented ",action.payload);
@@ -42,6 +50,7 @@ const cartSlice=createSlice({
 export const fetchCartProducts=createAsyncThunk(
     "cart/fetchCartProducts",
     async()=>{
+        console.log("Cart products");
         const {data}=await axios.get("http://localhost:3000/cart/show");
         return data;
     }

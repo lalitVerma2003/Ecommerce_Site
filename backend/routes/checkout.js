@@ -124,6 +124,7 @@ const createOrder = async (customer, data) => {
         totalCost: data.amount_total
     });
     await newOrder.save();
+    console.log("New order",newOrder);
     deleteFromCart(carts);
 }
 

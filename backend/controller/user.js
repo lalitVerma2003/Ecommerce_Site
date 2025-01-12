@@ -18,7 +18,7 @@ export async function createUser(req,res){
     }
 
     const{username,password,email,role}=value;
-    const user=await User.findOne({email});
+    const user=await User.findOne({email}).select("-password");
     if(user){
         const token=generateToken(user._id);
         return res.cookie("token", token, { httpOnly: true }).json(user);
@@ -41,7 +41,7 @@ export async function createUser(req,res){
         });
     }
     else{
-        res.status(400).send("User not created");
+        res.status(400).json("User not created");
     }
 }
 
@@ -57,18 +57,36 @@ export async function login(req,res){
 
     if(user&&(await user.matchPassword(password))){
         const token=generateToken(user._id);
-        res.cookie("token", token, { httpOnly: true }).json({
+        res.cookie("token", token).json({
             name:user.name,
             email:user.email,
             role:user.role,
         });
     }
     else{
-        res.status(400).send("User or password is wrong");
+        res.status(400).json("Invalid email or password");
     }
 }
 
 export function logout(req, res){
     res.clearCookie("token");
-    res.status(200).send("Logged out successfully");
+    console.log("Log out");
+    res.status(200).json("Logged out successfully");
+}
+
+export async function forgotPassword(req,res){
+    const { email,newPassword }=req.body;
+
+    const user=await User.findOne({email});
+
+    if(!user){
+        return res.json("User not registered with this email");
+    }
+
+    const salt=await bcrypt.genSalt(10);
+    const hashedPassword=await bcrypt.hash(newPassword,salt);
+    user.password=hashedPassword;
+    await user.save();
+
+    return res.json(user);
 }

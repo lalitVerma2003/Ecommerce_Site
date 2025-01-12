@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector, useDispatch } from "react-redux";
 import { login } from '../../store/userSlice/userSlice';
+import { closeModal, openModal,  setUserToken } from '../../store/tokenSlice/tokenSlice';
 
 axios.defaults.withCredentials = true;
 const schema = z.object({
@@ -30,7 +31,8 @@ const schema = z.object({
 });
 
 const Login = () => {
-  const show = useSelector(state => state.user.loading);
+  const {loading,error}= useSelector(state => state.user);
+  const [show,setShow]=useState(false);
   const toast = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,13 +45,14 @@ const Login = () => {
   useEffect(() => {
     const user = localStorage.getItem("userInfo");
     if (user) {
-      navigate("/home");
+      navigate("/");
     }
   })
 
   const loginUser = async (formData) => {
-    dispatch(login({ email: formData.email, password: formData.password }));
-    if (!show) {
+    await dispatch(login({ email: formData.email, password: formData.password }));
+    await dispatch(setUserToken());
+    if (error==null) {
       toast({
         title: 'Login Successfully',
         status: 'success',
@@ -58,13 +61,20 @@ const Login = () => {
       })
     } else {
       toast({
-        title: 'Error Occured',
+        title: error,
         description: "Username or Password is incorrect",
         status: 'error',
         duration: 5000,
         isClosable: true,
       })
     }
+  }
+
+  const handleLoginGogle=async()=>{
+    // It does not work yet , gives axios error.
+    // const {data}=await axios.get("http://localhost:3000/auth/google/callback");
+    // console.log(data);
+    window.open("http://localhost:3000/auth/google/callback","_self");
   }
 
   return (
@@ -90,7 +100,7 @@ const Login = () => {
           fontFamily={"Work sans"}
           m={4}
           p={1}
-        >Login</Text>
+        >LOGIN</Text>
 
         <FormControl>
           <FormLabel fontSize={"xl"} fontFamily={"Work sans"} m={3}  >Enter Email:</FormLabel>
@@ -119,8 +129,9 @@ const Login = () => {
             sign in
           </Link>
         </Text>
-        <Button m={6} onClick={handleSubmit(loginUser)} isDisabled={show ? true : false} >{show ? "Logging..." : "Login"}</Button>
+        <Button m={6} onClick={handleSubmit(loginUser)} isDisabled={loading ? true : false} >{loading ? "Logging..." : "Login"}</Button>
         <Text>{errors.root && errors.root.message}</Text>
+        <Button onClick={handleLoginGogle} >Sign by google</Button>
       </Box>
     </Box>
   )
