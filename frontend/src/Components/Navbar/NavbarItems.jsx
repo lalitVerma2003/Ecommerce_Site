@@ -2,15 +2,14 @@ import React from 'react'
 import { Link as ChakraLink } from "@chakra-ui/react";
 import NavbarItem from "./NavbarItem";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from '../../store/userSlice/userSlice';
 
-const NavbarItems = ({fontSize}) => {
+const NavbarItems = ({ fontSize }) => {
 
-    const user=useSelector(state=> state.user.user);
-    const dispatch=useDispatch();
-    const navigate=useNavigate();
+    const user = useSelector(state => state.user.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const logout = async () => {
         dispatch(logOut());
@@ -19,7 +18,7 @@ const NavbarItems = ({fontSize}) => {
 
     return (
         <>
-            <ChakraLink as={RouterLink} to={'/home'} >
+            <ChakraLink as={RouterLink} to={'/'} >
                 {user?.role === "admin" ? <NavbarItem itemName="My products" fontSize={fontSize} /> : <NavbarItem itemName="Home" fontSize={fontSize} />}
             </ChakraLink>
 
@@ -30,23 +29,19 @@ const NavbarItems = ({fontSize}) => {
                 <ChakraLink as={RouterLink} to={'/about'} >
                     <NavbarItem itemName="About" fontSize={fontSize} />
                 </ChakraLink>}
-            <ChakraLink as={RouterLink} to={"/orders"} >
+            {user&&(user.role==="user"&&<ChakraLink as={RouterLink} to={'/cart'} >
+                <NavbarItem itemName="Cart" fontSize={fontSize} />
+            </ChakraLink>)}
+            {user && (user.role === "admin" ? <ChakraLink as={RouterLink} to={'/orders'} >
+                <NavbarItem itemName="My Orders" fontSize={fontSize} />
+            </ChakraLink> : <ChakraLink as={RouterLink} to={"/myorders"} >
                 <NavbarItem itemName={"My orders"} fontSize={fontSize} />
-            </ChakraLink>
-            {!user ? <ChakraLink as={RouterLink} to={'/login'} >
-                Login
-            </ChakraLink> :
-                <>
-                    {user?.role === "admin" ? <ChakraLink as={RouterLink} to={'/myorders'} >
-                        <NavbarItem itemName="My Orders" fontSize={fontSize} />
-                    </ChakraLink> : <ChakraLink as={RouterLink} to={'/cart'} >
-                        <NavbarItem itemName="Cart" fontSize={fontSize} />
-                    </ChakraLink>}
-                </>
-            }
-            <ChakraLink onClick={logout} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></ChakraLink>
+            </ChakraLink>)}
+            {!user ? <ChakraLink as={RouterLink} to={'/login'} ><NavbarItem itemName={"Log in"} /></ChakraLink>
+                :
+                <ChakraLink onClick={logout} ><NavbarItem itemName={"Log out"} fontSize={fontSize} /></ChakraLink>}
         </>
     )
 }
 
-export default NavbarItems
+export default NavbarItems;

@@ -4,6 +4,8 @@ import productReducer from './productSlice/productSlice.js';
 import productSliceById from './productSlice/productSliceById.js';
 import orderReducer from './orderSlice/orderSlice.js';
 import cartReducer from './cartSlice/cartSlice.js';
+import tokenReducer from "./tokenSlice/tokenSlice.js";
+import { checkTokenExpire } from '../middleware/checkTokenExpire.js';
 
 const store=configureStore({
     reducer:{
@@ -11,8 +13,11 @@ const store=configureStore({
         product:productReducer,
         productById:productSliceById,
         order:orderReducer,
-        cart: cartReducer
-    }
+        cart: cartReducer,
+        token: tokenReducer
+    },
+    middleware:(getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(checkTokenExpire),
 });
 
 export default store;

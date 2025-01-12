@@ -5,7 +5,7 @@ import Product from './Product';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../../store/productSlice/productSlice';
 
-axios.defaults.withCredentials=true;
+// axios.defaults.withCredentials=true;
 
 const AdminProducts = () => {
     const user=useSelector(state=> state.user.user);
@@ -29,7 +29,8 @@ const AdminProducts = () => {
             flexWrap={"wrap"}
             w={"100%"}
             h={"auto"}
-            border={"2px solid red"}
+            flexGrow={1}
+            justifyContent={"space-evenly"}
         >
             {productData.map((p,i)=> <Product key={i} product={p} /> )}
         </Box>

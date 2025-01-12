@@ -6,9 +6,9 @@ import { checkAuth,checkOwner,checkAdmin } from '../utils/authMiddleware.js';
 import storage from "../cloudinary/uploading.js"; 
 const upload = multer({ storage: storage });
 
-router.get('/all',checkAuth,allProducts);
+router.get('/all',allProducts);
 
-router.get('/:id',checkAuth,showProduct);
+router.get('/:id',showProduct);
 
 router.post('/new',checkAuth,checkAdmin,upload.array("images",5),createProduct);
 

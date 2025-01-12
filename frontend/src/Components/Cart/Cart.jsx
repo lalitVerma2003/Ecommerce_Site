@@ -14,11 +14,12 @@ function Cart() {
     const [fetchAgain, setFetchAgain] = useState(false);
     const user=useSelector(state=> state.user.user);
     const {cartData,loading}=useSelector(state=> state.cart);
+    const tokenModal=useSelector(state=> state.token.token);
     const dispatch=useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) {
+        if (!tokenModal) {
             return;
         }
         getCartProducts();

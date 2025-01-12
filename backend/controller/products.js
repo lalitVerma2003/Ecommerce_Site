@@ -2,30 +2,23 @@ import Product from '../models/products.js';
 import Cart from '../models/cart.js';
 
 export async function allProducts(req, res) {
-    if (req.user.role === "admin") {
+    if (req.user&&(req.user.role === "admin")) {
         const productData = await Product.find({ owner: req.user });
         const total=productData.length;
         return res.json({productData,total});
     }
-    if (req.user.role === "user") {
-        let productData = await Product.find({});
+    // if (req.user.role === "user") {
         let { category, brand, page, limit } = req.query;
-        if (category) {
-            // category = category.toLowerCase();
-            productData = productData.filter((product)=> product.category===category)
-        }
-        if (brand) {
-            // brand=brand.toLowerCase();
-            productData = productData.filter((product)=> product.brand===brand)
-        }
+        // category = category.toLowerCase();
+        // brand=brand.toLowerCase();
+        let query={};
+        query=brand?{ ...query,brand:brand }:query;
+        query=category?{ ...query,category:category }:query;
+        let productData = await Product.find(query).skip((page-1)*limit).limit(limit).select("name description price images");
         let total=productData.length;
-        if(page&&limit){
-            page=parseInt(page,10);
-            limit=parseInt(limit,10);
-            productData=productData.slice((page-1)*limit,(page-1)*limit+limit);
-        }
+        // console.log(productData);
         res.status(200).json({productData,total});
-    }
+    // }
 }
 
 export async function showProduct(req, res) {

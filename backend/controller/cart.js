@@ -45,6 +45,10 @@ export async function addQuantity(req, res) {
 
 export async function showCart(req, res) {
     const id = req.user._id;
-    const cartItem = await Cart.find({ user: id }).populate('product');
+    const cartItem = await Cart.find({ user: id }).select("quantity").populate({
+        path: "product",
+        select: "name price description images"
+    });
+    console.log(cartItem);
     res.json(cartItem);
 }

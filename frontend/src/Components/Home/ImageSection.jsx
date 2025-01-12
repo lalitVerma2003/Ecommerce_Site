@@ -32,9 +32,9 @@ const ImageSection = () => {
         >
             <Image
                 w={"100%"}
-                h={{ base: "50vh", md: "65vh", lg: "80vh" }}
-                objectFit='cover'
-                src={`../images/HomeImage${imageIndex}.jpg`}
+                h={{ base: "50vh", md: "65vh", lg: "100vh" }}
+                objectFit='contain'
+                src={`../images/Image${imageIndex}.jpg`}
                 alt='No'
                 opacity={"0.9"}
             />

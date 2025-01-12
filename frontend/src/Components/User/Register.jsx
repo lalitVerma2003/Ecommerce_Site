@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Input, Button, FormControl, FormLabel, useToast, InputGroup, InputRightElement, Text } from '@chakra-ui/react';
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
-import { DataState } from '../../config/DataProvider';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDispatch, useSelector } from "react-redux";
+import { registered } from "../../store/userSlice/userSlice";
 
 const schema = z.object({
   username: z.string().min(5).max(15),
@@ -34,40 +34,25 @@ function Register() {
   const toast = useToast();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(schema) });
-  const { user, setUser } = DataState();
+  const {user}=useSelector(state=> state.user);
+  const dispatch=useDispatch();
+
+  useEffect(()=>{
+    if(user)
+      navigate("/");
+  });
 
   const handleForm = async (formData) => {
-    try {
-      const { username, password, email, role } = formData;
-      const config = {
-        headers: {
-          "Content-type": "application/json"
-        }
-      }
-      const { data } = await axios.post("http://localhost:3000/register", {
-        username, password, email, role
-      }, config);
-      console.log("Register", data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setUser(data);
-      toast({
-        title: 'Account created.',
-        description: "We've created your account for you.",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      navigate('/home');
-    }
-    catch (err) {
-      toast({
-        title: 'Error Occured',
-        description: "Fill the form correctfully",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    }
+    const { username, password, email, role } = formData;
+    dispatch(registered({username, password, email, role}));
+  }
+
+  const registerGuestUser=async()=>{
+    const random=Math.floor(Math.random()*100000);
+    const email=`guest${random}@gmail.com`;
+    const password=`Guest@${random}`;
+    const username=`guest${random}`;
+    dispatch(registered({username, password, email}));
   }
 
   return (
@@ -128,7 +113,8 @@ function Register() {
         </FormControl>
         {errors.role && <Text m={2} color={"red"} >*{errors.role.message}</Text>}
 
-        <Button m={8} onClick={handleSubmit(handleForm)} isDisabled={isSubmitting?true:false} >{isSubmitting?"Registering...":"Register"}</Button>
+        <Button mt={8} onClick={handleSubmit(handleForm)} isDisabled={isSubmitting?true:false} >{isSubmitting?"Registering...":"Register"}</Button>
+        <Button m={2} onClick={registerGuestUser} isDisabled={isSubmitting ? true : false} >{isSubmitting ? "Logging..." : "Login as a guest"}</Button>
       </Box>
     </Box>
   );

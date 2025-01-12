@@ -17,7 +17,7 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react'
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 const DetailProduct = () => {
 
@@ -33,9 +33,6 @@ const DetailProduct = () => {
   const dispatch=useDispatch();
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
     getProduct();
   }, [user,fetch]);
 
@@ -54,7 +51,13 @@ const DetailProduct = () => {
 
   const addCart = async () => {
     if (!user) {
-      return;
+      toast({
+        title: "Please login first",
+        status: 'info',
+        duration: 5000,
+        isClosable: true,
+      })
+      return navigate("/login");
     }
     dispatch(addToCart({productId:productId,count:count}));
   }
@@ -184,7 +187,7 @@ const DetailProduct = () => {
                 justifyContent={"space-between"}
                 alignItems={"center"}
               >
-                {user.role === "admin" ? (
+                {user?.role === "admin" ? (
                   <Box
                     w={"100%"}
                     h={"40%"}

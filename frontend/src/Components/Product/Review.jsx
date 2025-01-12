@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { HStack, VStack, FormControl, FormLabel, Textarea, Text, Select, Button, useToast, Box } from '@chakra-ui/react'
 import { IoIosStar, IoIosStarOutline } from 'react-icons/io';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Review = ({ product, setFetch }) => {
 
@@ -10,9 +12,19 @@ const Review = ({ product, setFetch }) => {
     const [rating, setRating] = useState(1);
     const [comment, setComment] = useState("");
     const toast = useToast();
-    // console.log(product);
+    const user=useSelector(state=> state.user.user);
+    const navigate=useNavigate();
 
     const handleReview = async () => {
+        if(!user){
+            toast({
+                title: "Please login first",
+                status: 'info',
+                duration: 5000,
+                isClosable: true,
+              })
+            return navigate("/login");
+        }
         try {
             const { data } = await axios.post(`http://localhost:3000/products/${product._id}/reviews`, {
                 rating: rating,
